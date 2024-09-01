@@ -1,52 +1,125 @@
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-public class Taschenrechner implements ActionListener {
+public class Taschenrechner extends Application {
 	
-	JFrame frame;
-	JButton button;
-	JLabel label;
-	JPanel panel;
-	
-	public Taschenrechner() {
-		
-		//Bildschirm, an der man den
-		//Inhalt zufügt
-		frame = new JFrame();
-		
-		//Buttons
-		button = new JButton();
-		label = new JLabel();
-		
-		
-		panel = new JPanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
-		panel.setLayout(new GridLayout());
-		
-		frame.add(panel, BorderLayout.CENTER);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Taschenrechner");
-		frame.pack();
-		frame.setVisible(true);
-		
-	}
-	
-	public static void main(String[] args) {
-		new Taschenrechner();
-	}
+	private Label resultLabel;
+	private TextField num1Field, num2Field;
+	private Button addButton, subtractButton, multiplyButton, divideButton, squareButton, sqrtButton;
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+	public void start(Stage primaryStage) throws Exception {
+		
+		//Hier werde ich die Benutzeroberfläche des Taschenrechners programmieren
+		
+		primaryStage.setTitle("Basic Calculator");
+		
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(10, 10, 10, 10));
+		
+		
+		
+		addButton = new Button(" Add ");
+		addButton.setOnAction(event -> performOperation('+'));
+		grid.setConstraints(addButton, 1, 0);
+		
+		subtractButton = new Button(" Subtract ");
+		subtractButton.setOnAction(event -> performOperation('-'));
+		grid.setConstraints(subtractButton, 2, 0);
+		
+		multiplyButton = new Button(" Multiply ");
+		multiplyButton.setOnAction(event -> performOperation('•'));
+		grid.setConstraints(multiplyButton, 1, 1);
+		
+		divideButton = new Button(" Divide ");
+		divideButton.setOnAction(event -> performOperation('÷'));
+		grid.setConstraints(divideButton, 2, 1);
+		
+		/*squareButton = new Button(" Square ");
+		squareButton.setOnAction(event -> performOperation('ˆ'));
+		grid.setConstraints(squareButton, 1, 2);
+		
+		sqrtButton = new Button(" SquareRoot ");
+		sqrtButton.setOnAction(event -> performOperation('√'));*/
+		
+		resultLabel = new Label("Result");
+		grid.setConstraints(resultLabel, 0, 2);
+		
+		num1Field = new TextField();
+		num1Field.setPromptText("Enter first number");
+		grid.setConstraints(num1Field, 0, 0);
+		
+		num2Field = new TextField();
+		num2Field.setPromptText("Enter second number");
+		grid.setConstraints(num2Field, 0, 1);
+		
+		grid.getChildren().addAll(num1Field, num2Field, resultLabel, addButton, subtractButton, multiplyButton, divideButton);
+		
+		
+		
+		Scene scene = new Scene(grid, 300, 200);
+		primaryStage.setScene(scene);
+		primaryStage.show();
 		
 	}
+	
+	private void performOperation(char operator) {
+		String num1Text = num1Field.getText();
+		String num2Text = num2Field.getText();
+		
+		if(isValidNumber(num1Text) && isValidNumber(num2Text)) {
+			double num1 = Double.parseDouble(num1Text);
+			double num2 = Double.parseDouble(num2Text);
+			double result = 0.0;
+			
+			switch(operator) {
+			case '+':
+				result = num1 + num2;
+				break;
+			case '-':
+				result = num1 - num2;
+				break;
+			case '•':
+				result = num1 * num2;
+				break;
+			case '÷':
+				if(num2 != 0) {
+					result = num1 / num2;
+				} else {
+					resultLabel.setText("Es kann nicht durch 0 geteilt werden");
+					return;
+				}
+				break;
+			case 'ˆ':
+				
+			default:
+				break;
+				
+			}
+			
+			resultLabel.setText("Result: " + result);
+		} else {
+			resultLabel.setText("Result: Invalid Input");
+		}
+	}
+	
+	private boolean isValidNumber(String text) {
+		return text.matches("-?\\d*\\.?\\d+\\dˆ\\d√");
+	}
+
+	public static void main(String[] args) {
+		launch(args);
+	}
+	
 
 }
