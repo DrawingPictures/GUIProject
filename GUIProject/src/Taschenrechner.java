@@ -30,27 +30,28 @@ public class Taschenrechner extends Application {
 		
 		
 		addButton = new Button(" Add ");
-		addButton.setOnAction(event -> performOperation('+'));
+		addButton.setOnAction(event -> performOperation("+"));
 		grid.setConstraints(addButton, 1, 0);
 		
 		subtractButton = new Button(" Subtract ");
-		subtractButton.setOnAction(event -> performOperation('-'));
+		subtractButton.setOnAction(event -> performOperation("-"));
 		grid.setConstraints(subtractButton, 2, 0);
 		
 		multiplyButton = new Button(" Multiply ");
-		multiplyButton.setOnAction(event -> performOperation('•'));
+		multiplyButton.setOnAction(event -> performOperation("•"));
 		grid.setConstraints(multiplyButton, 1, 1);
 		
 		divideButton = new Button(" Divide ");
-		divideButton.setOnAction(event -> performOperation('÷'));
+		divideButton.setOnAction(event -> performOperation("÷"));
 		grid.setConstraints(divideButton, 2, 1);
 		
-		/*squareButton = new Button(" Square ");
-		squareButton.setOnAction(event -> performOperation('ˆ'));
+		squareButton = new Button(" Square ");
+		squareButton.setOnAction(event -> performOperation("ˆ"));
 		grid.setConstraints(squareButton, 1, 2);
 		
 		sqrtButton = new Button(" SquareRoot ");
-		sqrtButton.setOnAction(event -> performOperation('√'));*/
+		sqrtButton.setOnAction(event -> performOperation("√"));
+		grid.setConstraints(sqrtButton, 2, 2);
 		
 		resultLabel = new Label("Result");
 		grid.setConstraints(resultLabel, 0, 2);
@@ -63,7 +64,7 @@ public class Taschenrechner extends Application {
 		num2Field.setPromptText("Enter second number");
 		grid.setConstraints(num2Field, 0, 1);
 		
-		grid.getChildren().addAll(num1Field, num2Field, resultLabel, addButton, subtractButton, multiplyButton, divideButton);
+		grid.getChildren().addAll(num1Field, num2Field, resultLabel, addButton, subtractButton, multiplyButton, divideButton, squareButton, sqrtButton);
 		
 		
 		
@@ -73,7 +74,7 @@ public class Taschenrechner extends Application {
 		
 	}
 	
-	private void performOperation(char operator) {
+	private void performOperation(String operator) {
 		String num1Text = num1Field.getText();
 		String num2Text = num2Field.getText();
 		
@@ -83,16 +84,16 @@ public class Taschenrechner extends Application {
 			double result = 0.0;
 			
 			switch(operator) {
-			case '+':
+			case "+":
 				result = num1 + num2;
 				break;
-			case '-':
+			case "-":
 				result = num1 - num2;
 				break;
-			case '•':
+			case "•":
 				result = num1 * num2;
 				break;
-			case '÷':
+			case "÷":
 				if(num2 != 0) {
 					result = num1 / num2;
 				} else {
@@ -100,9 +101,32 @@ public class Taschenrechner extends Application {
 					return;
 				}
 				break;
-			case 'ˆ':
-				
+			case "ˆ":
+				if(!num2Text.isEmpty() || !num2Text.isEmpty() && num1Text.isEmpty()) {
+					result = Math.pow(num2, 2);
+				} else if(!num1Text.isEmpty() || !num1Text.isEmpty() && num2Text.isEmpty()) {
+					result = Math.pow(num1, 2);
+				}
+				break;
+			case "√":
+				if(!num2Text.isEmpty()) {
+					if(num2 >= 0) {
+						result = Math.sqrt(num2);
+					} else {
+						resultLabel.setText("Ungültige Eingabe für Wurzel");
+						return;
+					}
+				} else {
+					if(num1 >= 0) {
+						result = Math.sqrt(num1);
+					} else {
+						resultLabel.setText("Ungültige Eingabe für Wurzel");
+						return;
+					}
+				}
+				break;
 			default:
+				resultLabel.setText("Ungültige Eingabe eines Operators");
 				break;
 				
 			}
@@ -114,8 +138,10 @@ public class Taschenrechner extends Application {
 	}
 	
 	private boolean isValidNumber(String text) {
-		return text.matches("-?\\d*\\.?\\d+\\dˆ\\d√");
+		return text.matches("-?\\d*\\.?\\d+");
 	}
+	
+	
 
 	public static void main(String[] args) {
 		launch(args);
