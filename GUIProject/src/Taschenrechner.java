@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -12,7 +13,7 @@ import javafx.stage.Stage;
 public class Taschenrechner extends Application {
 	
 	private Label resultLabel;
-	private TextField num1Field, num2Field;
+	private TextField num1Field, num2Field, activeField;
 	private Button addButton, subtractButton, multiplyButton, divideButton, squareButton, sqrtButton;
 
 	@Override
@@ -46,11 +47,11 @@ public class Taschenrechner extends Application {
 		grid.setConstraints(divideButton, 2, 1);
 		
 		squareButton = new Button(" Square ");
-		squareButton.setOnAction(event -> performOperation("ˆ"));
+		squareButton.setOnAction(event -> performSquareOrSqrt("ˆ"));
 		grid.setConstraints(squareButton, 1, 2);
 		
 		sqrtButton = new Button(" SquareRoot ");
-		sqrtButton.setOnAction(event -> performOperation("√"));
+		sqrtButton.setOnAction(event -> performSquareOrSqrt("√"));
 		grid.setConstraints(sqrtButton, 2, 2);
 		
 		resultLabel = new Label("Result");
@@ -59,6 +60,7 @@ public class Taschenrechner extends Application {
 		num1Field = new TextField();
 		num1Field.setPromptText("Enter first number");
 		grid.setConstraints(num1Field, 0, 0);
+		num1Field.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> setActiveField(num1Field));
 		
 		num2Field = new TextField();
 		num2Field.setPromptText("Enter second number");
@@ -101,30 +103,7 @@ public class Taschenrechner extends Application {
 					return;
 				}
 				break;
-			case "ˆ":
-				if(!num2Text.isEmpty() || !num2Text.isEmpty() && num1Text.isEmpty()) {
-					result = Math.pow(num2, 2);
-				} else if(!num1Text.isEmpty() || !num1Text.isEmpty() && num2Text.isEmpty()) {
-					result = Math.pow(num1, 2);
-				}
-				break;
-			case "√":
-				if(!num2Text.isEmpty()) {
-					if(num2 >= 0) {
-						result = Math.sqrt(num2);
-					} else {
-						resultLabel.setText("Ungültige Eingabe für Wurzel");
-						return;
-					}
-				} else {
-					if(num1 >= 0) {
-						result = Math.sqrt(num1);
-					} else {
-						resultLabel.setText("Ungültige Eingabe für Wurzel");
-						return;
-					}
-				}
-				break;
+			
 			default:
 				resultLabel.setText("Ungültige Eingabe eines Operators");
 				break;
@@ -133,8 +112,51 @@ public class Taschenrechner extends Application {
 			
 			resultLabel.setText("Result: " + result);
 		} else {
-			resultLabel.setText("Result: Invalid Input");
+			resultLabel.setText("Result: Ungültiger Input");
 		}
+	}
+	
+	private void performSquareOrSqrt(String operator) {
+		if(activeField == null) {
+			if(!num1Field.getText().isEmpty() && num2Field.getText().isEmpty()) {
+				activeField = num1Field;
+			} else if(num1Field.getText().isEmpty() && !num2Field.getText().isEmpty()) {
+				activeField = num2Field;
+			} else {
+				resultLabel.setText("Bitte wähle eines der Felder aus");
+				return;
+			}
+			
+		}
+		
+		String activeText = activeField.getText();
+		if(isValidNumber(activeText)) {
+			double number = Double.parseDouble(activeText);
+			double result = 0.0;
+			
+			switch(operator) {
+			
+			case "ˆ":
+				result = Math.pow(number, 2);
+				break;
+			case "√":
+				if(number >= 0) {
+					result = Math.sqrt(number);
+				} else {
+					resultLabel.setText("Ungültige Eingabe der QuadratWurzel");
+					return;
+				}
+				break;
+			
+			}
+			resultLabel.setText("Result: " + result);
+		} else {
+			resultLabel.setText("Ungültige Ungültiger Input");
+		}
+	}
+	
+	private void setActiveField(TextField field) {
+		this.activeField= field;
 	}
 	
 	private boolean isValidNumber(String text) {
